@@ -573,8 +573,11 @@ static bool only_implicit_values(GWBUF *buffer)
 static bool extract_insert_target(GWBUF *buffer, char* target, int len)
 {
     bool rval = false;
+    uint8_t cmd = 0;
 
-    if (qc_get_operation(buffer) == QUERY_OP_INSERT &&
+    if (gwbuf_copy_data(buffer, MYSQL_HEADER_LEN, 1, &cmd) &&
+        cmd == MYSQL_COM_QUERY &&
+        qc_get_operation(buffer) == QUERY_OP_INSERT &&
         only_implicit_values(buffer))
     {
         int n_tables = 0;
